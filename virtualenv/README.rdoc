@@ -1,0 +1,10 @@
+= DESCRIPTION:
+
+Provides a definition for creating python virtualenvs.
+
+= REQUIREMENTS:
+
+= ATTRIBUTES:
+
+= USAGE:
+
