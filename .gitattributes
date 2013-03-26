@@ -1,0 +1,6 @@
+# Automatically normalize line endings for all text-based files
+* text=auto
+apply.whitespace=error-all
+apply.ignorewhitespace=no
+core.whitespace=tab-in-indent,tabwidth=4,trailing-space
+color.diff.whitespace=red reverse
