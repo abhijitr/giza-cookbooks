@@ -1,7 +1,7 @@
 include_recipe "virtualenv"
 
 node[:deploy].each do |application, deploy|
-  if deploy[:application_type] != 'other'
+  if deploy[:application_type] != 'static'
     Chef::Log.debug("Skipping deploy::web application #{application} as it is not a giza app")
     next
   end
