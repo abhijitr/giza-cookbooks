@@ -1,0 +1,3 @@
+[submodule "supervisor"]
+	path = supervisor
+	url = git://github.com/opscode-cookbooks/supervisor.git
