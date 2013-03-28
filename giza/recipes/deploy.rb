@@ -26,4 +26,22 @@ node[:deploy].each do |application, deploy|
     command "cat #{deploy[:deploy_to]}/current/npm_requirements.txt | xargs npm install -g"
     only_if "test -f #{deploy[:deploy_to]}/current/npm_requirements.txt"
   end
+
+  # start uwsgi under supervisor
+  supervisor_service "uwsgi-#{application}" do
+    action [:enable, :restart]
+    command "uwsgi --ini-paste-logged production.ini -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
+    environment deploy[:environment]
+    stopsignal "INT"
+    directory "#{deploy[:deploy_to]}/current"
+    autostart false
+    user deploy[:user] 
+  end 
+
+  # reconfigure nginx to override the opsworks defaults
+  nginx_web_app application do
+    application deploy
+    template "nginx.erb"
+    cookbook "giza"
+  end 
 end
