@@ -18,6 +18,12 @@ node[:deploy].each do |application, deploy|
     group deploy[:group] 
     owner deploy[:user] 
     action :create
-    requirements_file "/srv/gelato/current/search/requirements.txt"
+    requirements_file "#{deploy[:deploy_to]}/current/requirements.txt"
+  end
+
+  # install all the modules in npm_requirements.txt
+  execute "npm-dependencies-#{application}" do
+    command "cat #{deploy[:deploy_to]}/current/npm_requirements.txt | xargs npm install -g"
+    only_if "test -f #{deploy[:deploy_to]}/current/npm_requirements.txt"
   end
 end
