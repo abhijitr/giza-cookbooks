@@ -3,7 +3,6 @@
 define :virtualenv, :action => :create, :owner => "root", :group => "root", :mode => 0755, :packages => {}, :requirements_file => nil, :interpreter => "/usr/bin/python", :find_links => nil do
     path = params[:path] ? params[:path] : params[:name]
     pip = "#{path}/bin/pip"
-    log_path = params[:log_path] ? params[:log_path] : path
 
     if params[:action] == :create
         # Manage the directory.
@@ -33,10 +32,10 @@ define :virtualenv, :action => :create, :owner => "root", :group => "root", :mod
             group params[:group]
             cwd "/tmp"
             if params[:find_links]
-                command "#{pip} install --find-links=file://#{params[:find_links]} --no-index --log=#{log_path}/pip.log -r #{params[:requirements_file]}"
+                command "#{pip} install --find-links=file://#{params[:find_links]} --no-index --log=#{path}/pip.log -r #{params[:requirements_file]}"
             else
                 environment 'PIP_DOWNLOAD_CACHE' => '/tmp/PIP_DOWNLOAD_CACHE'
-                command "#{pip} install --use-mirrors --log=#{log_path}/pip.log -r #{params[:requirements_file]}"
+                command "#{pip} install --use-mirrors --log=#{path}/pip.log -r #{params[:requirements_file]}"
             end
           end
         end

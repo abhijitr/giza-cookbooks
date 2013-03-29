@@ -19,7 +19,6 @@ node[:deploy].each do |application, deploy|
     owner deploy[:user] 
     action :create
     requirements_file "#{deploy[:deploy_to]}/current/requirements.txt"
-    log_path "#{deploy[:deploy_to]}/current"
   end
 
   # install all the modules in npm_requirements.txt
