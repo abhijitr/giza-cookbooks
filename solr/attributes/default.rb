@@ -1,0 +1,6 @@
+default.solr.log_dir = "/var/log/solr"
+default.solr.home_dir = "/opt/solr"
+default.solr.app_name = "pickie"
+default.solr.download_url = "http://psg.mtu.edu/pub/apache/lucene/solr/4.2.0/solr-4.2.0.tgz"
+default.solr.download_checksum = "209396afde400c316245e17a5ee229b67bca390a25537bd3e271467ae6754d0c"
+default.solr.group = "solr"

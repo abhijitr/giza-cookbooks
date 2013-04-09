@@ -1,0 +1,20 @@
+description "Solr Search Server"
+
+setuid solr
+setgid solr
+
+# Make sure the file system and network devices have started before
+# we begin the daemon
+start on (filesystem and net-device-up IFACE!=lo)
+
+# Stop the event daemon on system shutdown
+stop on shutdown
+
+# Respawn the process on unexpected termination
+respawn
+
+chdir "/opt/solr/pickie"
+
+
+# The meat and potatoes
+exec /usr/bin/java -jar start.jar >> /var/log/solr.log 2>&1
