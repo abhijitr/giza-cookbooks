@@ -33,6 +33,17 @@ node[:deploy].each do |application, deploy|
     requirements_file "#{deploy[:deploy_to]}/current/#{deploy[:requirements_path]}"
   end
 
+  # start gunicorn under supervisor
+  supervisor_service "gunicorn-#{application}" do
+    action [:enable, :restart]
+    command "#{deploy[:deploy_to]}/shared/#{application-env}/bin/gunicorn --preload -w 2 -k gevent -b 0.0.0.0:8000 picnic.wsgi"
+    environment deploy[:environment]
+    stopsignal "INT"
+    directory "#{deploy[:deploy_to]}/current/search"
+    autostart false
+    user deploy[:user] 
+  end 
+
   # configure nginx 
   nginx_web_app application do
     application deploy

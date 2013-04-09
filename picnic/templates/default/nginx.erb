@@ -1,3 +1,6 @@
+# define a rate limiting zone
+limit_req_zone $binary_remote_addr zone=proxy:10m rate=10r/s;
+
 server {
   listen 80;
   keepalive_timeout 0;
