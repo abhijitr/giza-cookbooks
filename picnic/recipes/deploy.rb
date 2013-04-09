@@ -25,4 +25,18 @@ node[:deploy].each do |application, deploy|
     action :create
     recursive true
   end
+
+  virtualenv "#{deploy[:deploy_to]}/shared/#{application}-env" do
+    group deploy[:group] 
+    owner deploy[:user] 
+    action :create
+    requirements_file "#{deploy[:deploy_to]}/current/#{deploy[:requirements_path]}"
+  end
+
+  # configure nginx 
+  nginx_web_app application do
+    application deploy
+    template "nginx.erb"
+    cookbook "picnic"
+  end 
 end
