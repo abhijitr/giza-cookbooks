@@ -42,7 +42,7 @@ node[:deploy].each do |application, deploy|
   # start worker process under supervisor
   supervisor_service "worker-#{application}" do
     action [:enable, :restart]
-    command "celeryd -A worker.celery --loglevel=info"
+    command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/celeryd -A worker.celery --loglevel=info"
     environment deploy[:environment]
     stopsignal "TERM"
     directory "#{deploy[:deploy_to]}/current"
