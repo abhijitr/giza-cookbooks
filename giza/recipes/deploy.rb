@@ -39,6 +39,17 @@ node[:deploy].each do |application, deploy|
     only_if "test -f #{deploy[:deploy_to]}/current/#{deploy[:npm_requirements_path]}"
   end
 
+  # start worker process under supervisor
+  supervisor_service "worker-#{application}" do
+    action [:enable, :restart]
+    command "celeryd -A worker.celery --loglevel=info"
+    environment deploy[:environment]
+    stopsignal "TERM"
+    directory "#{deploy[:deploy_to]}/current"
+    autostart false
+    user deploy[:user] 
+  end 
+
   # start uwsgi under supervisor
   supervisor_service "uwsgi-#{application}" do
     action [:enable, :restart]
