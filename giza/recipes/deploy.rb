@@ -67,4 +67,14 @@ node[:deploy].each do |application, deploy|
     template "nginx.erb"
     cookbook "giza"
   end 
+
+  template "/etc/boto.cfg" do
+    source "boto_config.erb" 
+    owner deploy[:user] 
+    group deploy[:group] 
+    mode 0644
+    variables(
+      :deploy => deploy
+    )
+  end
 end
