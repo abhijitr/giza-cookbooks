@@ -2,6 +2,7 @@ server {
   listen   80;
   server_name  <%= @application[:domains].join(" ") %> <%= node[:hostname] %>;
   access_log  <%= node[:nginx][:log_dir] %>/<%= @application[:domains].first %>.access.log;
+  underscores_in_headers on;
 
   location / {
     uwsgi_pass unix:///tmp/uwsgi-<%= @application_name %>.sock;
@@ -32,6 +33,7 @@ server {
   listen   443;
   server_name  <%= @application[:domains].join(" ") %> <%= node[:hostname] %>;
   access_log  <%= node[:nginx][:log_dir] %>/<%= @application[:domains].first %>-ssl.access.log;
+  underscores_in_headers on;
   
   ssl on;
   ssl_certificate /etc/nginx/ssl/<%= @application[:domains].first %>.crt;
