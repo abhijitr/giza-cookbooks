@@ -53,7 +53,7 @@ node[:deploy].each do |application, deploy|
   # start uwsgi under supervisor
   supervisor_service "uwsgi-#{application}" do
     action [:enable, :restart]
-    command "uwsgi --ini-paste-logged #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
+    command "uwsgi --lazy --ini-paste-logged #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
     environment deploy[:environment]
     stopsignal "INT"
     directory "#{deploy[:deploy_to]}/current"
