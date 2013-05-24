@@ -79,7 +79,7 @@ node[:deploy].each do |application, deploy|
   end
 
   # update rsyslog config
-  template "/etc/rsyslog.cfg" do
+  template "/etc/rsyslog.conf" do
     source "rsyslog.conf.erb" 
     mode 0644
     variables(
@@ -98,7 +98,7 @@ node[:deploy].each do |application, deploy|
   end
   
   template "/etc/rsyslog.d/23-giza.conf" do
-    source "22-giza.conf.erb"
+    source "23-giza.conf.erb"
     mode 0644
     variables(
       :deploy => deploy
