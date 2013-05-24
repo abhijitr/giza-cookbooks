@@ -78,40 +78,48 @@ node[:deploy].each do |application, deploy|
     )
   end
 
-  # update rsyslog config
-  template "/etc/rsyslog.conf" do
-    source "rsyslog.conf.erb" 
-    mode 0644
-    variables(
-      :deploy => deploy
-    )
-    notifies :restart, "rsyslog"
-  end
-  
-  template "/etc/rsyslog.d/22-nginx.conf" do
-    source "22-nginx.conf.erb"
-    mode 0644
-    variables(
-      :deploy => deploy
-    )
-    notifies :restart, "rsyslog"
-  end
-  
-  template "/etc/rsyslog.d/23-giza.conf" do
-    source "23-giza.conf.erb"
-    mode 0644
-    variables(
-      :deploy => deploy
-    )
-    notifies :restart, "rsyslog"
-  end
-  
-  template "/etc/rsyslog.d/50-default.conf" do
-    source "50-default.conf.erb"
-    mode 0644
-    variables(
-      :deploy => deploy
-    )
-    notifies :restart, "rsyslog"
+  action :create do
+    # Define me a local rsyslog service so I can restart it
+    service "rsyslog" do
+      supports :restart => true, :reload => true
+      action :nothing
+    end
+
+    # update rsyslog config
+    template "/etc/rsyslog.conf" do
+      source "rsyslog.conf.erb" 
+      mode 0644
+      variables(
+        :deploy => deploy
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
+    
+    template "/etc/rsyslog.d/22-nginx.conf" do
+      source "22-nginx.conf.erb"
+      mode 0644
+      variables(
+        :deploy => deploy
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
+    
+    template "/etc/rsyslog.d/23-giza.conf" do
+      source "23-giza.conf.erb"
+      mode 0644
+      variables(
+        :deploy => deploy
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
+    
+    template "/etc/rsyslog.d/50-default.conf" do
+      source "50-default.conf.erb"
+      mode 0644
+      variables(
+        :deploy => deploy
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
   end
 end
