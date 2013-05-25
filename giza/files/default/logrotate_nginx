@@ -1,0 +1,25 @@
+/var/log/nginx/*.log {
+        daily
+        missingok
+        rotate 7 
+        compress
+        delaycompress
+        notifempty
+        create 0640 www-data adm
+        sharedscripts
+        prerotate
+                if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+                        run-parts /etc/logrotate.d/httpd-prerotate; \
+                fi; \
+        endscript
+        postrotate
+                [ ! -f /var/run/nginx.pid ] || kill -USR1 `cat /var/run/nginx.pid`
+                for f in /var/log/nginx/*.lzo
+                do
+                    if [ -e $f ]
+                    then
+                        /usr/local/bin/aws s3 put-object --bucket pickie-logs --key nginx/$(basename $f) --body $f 
+                    fi
+                done
+        endscript
+}
