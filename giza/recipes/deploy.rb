@@ -7,6 +7,14 @@ node[:deploy].each do |application, deploy|
     next
   end
 
+  supervisor_env = deploy[:environment].merge({
+    "virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env",
+    "HOME" => "/home/#{deploy[:user]}",
+    "USER" => deploy[:user],
+    "USERNAME" => deploy[:user],
+    "LOGNAME" => deploy[:user]
+  })
+
   opsworks_deploy_dir do
     user deploy[:user]
     group deploy[:group]
@@ -43,7 +51,7 @@ node[:deploy].each do |application, deploy|
   supervisor_service "worker-#{application}" do
     action [:enable, :restart]
     command "#{deploy[:deploy_to]}/current/giza/deploy/start_worker.sh"
-    environment deploy[:environment].merge({"virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env"})
+    environment supervisor_env 
     stopsignal "TERM"
     directory "#{deploy[:deploy_to]}/current"
     autostart false
@@ -54,7 +62,7 @@ node[:deploy].each do |application, deploy|
   supervisor_service "uwsgi-#{application}" do
     action [:enable, :restart]
     command "uwsgi --lazy --ini-paste-logged #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
-    environment deploy[:environment].merge({"virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env"})
+    environment supervisor_env
     stopsignal "INT"
     directory "#{deploy[:deploy_to]}/current"
     autostart false
