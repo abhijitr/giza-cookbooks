@@ -42,8 +42,8 @@ node[:deploy].each do |application, deploy|
   # start worker process under supervisor
   supervisor_service "worker-#{application}" do
     action [:enable, :restart]
-    command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/celeryd -A worker.celery --loglevel=info"
-    environment deploy[:environment]
+    command "#{deploy[:deploy_to]}/current/giza/deploy/start_worker.sh"
+    environment deploy[:environment].merge({"virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env"})
     stopsignal "TERM"
     directory "#{deploy[:deploy_to]}/current"
     autostart false
@@ -54,7 +54,7 @@ node[:deploy].each do |application, deploy|
   supervisor_service "uwsgi-#{application}" do
     action [:enable, :restart]
     command "uwsgi --lazy --ini-paste-logged #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
-    environment deploy[:environment]
+    environment deploy[:environment].merge({"virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env"})
     stopsignal "INT"
     directory "#{deploy[:deploy_to]}/current"
     autostart false
