@@ -58,10 +58,21 @@ node[:deploy].each do |application, deploy|
     user deploy[:user] 
   end 
 
+  # start celerybeat under supervisor
+  supervisor_service "scheduler-#{application}" do
+    action [:enable, :restart]
+    command "#{deploy[:deploy_to]}/current/giza/deploy/start_scheduler.sh"
+    environment supervisor_env 
+    stopsignal "TERM"
+    directory "#{deploy[:deploy_to]}/current"
+    autostart false
+    user deploy[:user] 
+  end 
+
   # start uwsgi under supervisor
   supervisor_service "uwsgi-#{application}" do
     action [:enable, :restart]
-    command "uwsgi --lazy --ini-paste-logged #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
+    command "uwsgi --lazy --ini-paste #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
     environment supervisor_env
     stopsignal "INT"
     directory "#{deploy[:deploy_to]}/current"
