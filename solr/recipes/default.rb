@@ -67,7 +67,7 @@ bash "copy_example" do
 end
 
 # Install default templates
-%w(schema.xml solrconfig.xml).each do |conf_template|
+%w(schema.xml solrconfig.xml data-import-config.xml).each do |conf_template|
   template File.join(node[:solr][:home_dir], node[:solr][:app_name], 'solr', 'collection1', 'conf', conf_template) do
     owner 'solr'
     group 'solr'
