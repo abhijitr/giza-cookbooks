@@ -15,7 +15,12 @@
     }
   ]]></script>
   <document>
-    <entity name="product" transformer="script:ExtractJson" query="SELECT id,url,name,description,brand_uid,category_uid,subcategory_uid,store_domain,price,quantity,mention_stats,faves_count,image_keys[1] AS image_key FROM products">
+    <entity name="product"
+            transformer="script:ExtractJson"
+            query="SELECT id,url,name,description,brand_uid,category_uid,subcategory_uid,
+                          store_domain,store_name,store_url,sale_price,price,quantity,
+                          mention_stats,faves_count,created_date,updated_date,content,
+                          concierge_item,image_keys[1] AS image_key FROM products">
     </entity>
   </document>
 </dataConfig>

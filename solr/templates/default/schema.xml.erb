@@ -103,18 +103,25 @@
    <field name="brand_uid" type="string" indexed="true" stored="true" />
    <field name="category_uid" type="string" indexed="true" stored="true" />
    <field name="subcategory_uid" type="string" indexed="true" stored="true" />
-   <field name="store_domain" type="string" indexed="true" stored="true" />
+   <field name="store_domain" type="string" indexed="false" stored="true" />
+   <field name="store_name" type="string" indexed="true" stored="true" />
+   <field name="store_url" type="string" indexed="false" stored="true" />
    <field name="price" type="currency" indexed="true" stored="true" />
+   <field name="sale_price" type="currency" indexed="true" stored="true" />
    <field name="quantity" type="tlong" indexed="true" stored="true" />
-   <field name="mention_count_all" type="tlong" indexed="true" stored="true" />
-   <field name="mention_count_twitter" type="tlong" indexed="true" stored="true" />
-   <field name="mention_count_pinterest" type="tlong" indexed="true" stored="true" />
-   <field name="mention_count_facebook" type="tlong" indexed="true" stored="true" />
-   <field name="trended" type="boolean" indexed="true" stored="true" />
-   <field name="saves_count" type="tlong" indexed="true" stored="true" />
-   <field name="likes_count" type="tlong" indexed="true" stored="true" />
-   <field name="faves_count" type="tlong" indexed="true" stored="true" />
+   <field name="mention_count_all" type="tlong" indexed="false" stored="true" />
+   <field name="mention_count_twitter" type="tlong" indexed="false" stored="true" />
+   <field name="mention_count_pinterest" type="tlong" indexed="false" stored="true" />
+   <field name="mention_count_facebook" type="tlong" indexed="false" stored="true" />
+   <field name="trended" type="boolean" indexed="false" stored="true" />
+   <field name="saves_count" type="tlong" indexed="false" stored="true" />
+   <field name="likes_count" type="tlong" indexed="false" stored="true" />
+   <field name="faves_count" type="tlong" indexed="false" stored="true" />
    <field name="image_key" type="string" indexed="false" stored="true" />
+   <field name="concierge_item" type="boolean" indexed="false" stored="true" />
+   <field name="content" type="string" indexed="false" stored="true" />
+   <field name="created_date" type="date" indexed="false" stored="true" />
+   <field name="updated_date" type="date" indexed="false" stored="true" />
    <field name="text" type="text_en_splitting" indexed="true" stored="false" multiValued="true" termVectors="true" />
 
    <!-- Uncommenting the following will create a "timestamp" field using
