@@ -94,36 +94,28 @@
       and back compatibility is not guaranteed.  Names with both leading and
       trailing underscores (e.g. _version_) are reserved.
    -->
-<field name="_version_" type="long" indexed="true" stored="true"/>
-
-<field name="id" type="plong" indexed="true" stored="true" required="true" />
-<field name="domain" type="string" indexed="true" stored="true" />
-<field name="name" type="text_en_splitting" indexed="true" stored="true" />
-<field name="price" type="pfloat" indexed="true" stored="true" />
-<field name="quantity" type="plong" indexed="true" stored="true" />
-<field name="description" type="text_en_splitting" indexed="true" stored="true" />
-<field name="brand" type="string" indexed="true" stored="true" />
-<field name="category" type="string" indexed="true" stored="true" multiValued="true" />
-<field name="facebook_like_ids" type="string" indexed="true" stored="true" multiValued="true" />
-<field name="pinterest_mentioners" type="string" indexed="true" stored="true" multiValued="true" />
-<field name="sold_out" type="boolean" indexed="true" stored="true" />
-<field name="mention_count_all" type="plong" indexed="true" stored="true" />
-<field name="mention_count_twitter" type="plong" indexed="true" stored="true" />
-<field name="mention_count_pinterest" type="plong" indexed="true" stored="true" />
-<field name="mention_count_facebook" type="plong" indexed="true" stored="true" />
-<field name="trend_score_all" type="pfloat" indexed="true" stored="true" />
-<field name="trend_score_twitter" type="pfloat" indexed="true" stored="true" />
-<field name="trend_score_pinterest" type="pfloat" indexed="true" stored="true" />
-<field name="trend_score_facebook" type="pfloat" indexed="true" stored="true" />
-<field name="last_mention_all" type="string" indexed="true" stored="true" />
-<field name="last_mention_twitter" type="string" indexed="true" stored="true" />
-<field name="last_mention_pinterest" type="string" indexed="true" stored="true" />
-<field name="last_mention_facebook" type="string" indexed="true" stored="true" />
-<field name="likes_count" type="plong" indexed="true" stored="true"  />
-<field name="saves_count" type="plong" indexed="true" stored="true" />
-<field name="text" type="text_en_splitting" indexed="true" stored="false" multiValued="true" termVectors="true" />
-<field name="image_key" type="string" indexed="false" stored="true" />
-
+   <field name="_version_" type="long" indexed="true" stored="true"/>
+   
+   <field name="id" type="tlong" indexed="true" stored="true" required="true" />
+   <field name="url" type="string" indexed="true" stored="true" />
+   <field name="name" type="text_en_splitting" indexed="true" stored="true" />
+   <field name="description" type="text_en_splitting" indexed="true" stored="true" />
+   <field name="brand_uid" type="string" indexed="true" stored="true" />
+   <field name="category_uid" type="string" indexed="true" stored="true" />
+   <field name="subcategory_uid" type="string" indexed="true" stored="true" />
+   <field name="store_domain" type="string" indexed="true" stored="true" />
+   <field name="price" type="currency" indexed="true" stored="true" />
+   <field name="quantity" type="tlong" indexed="true" stored="true" />
+   <field name="mention_count_all" type="tlong" indexed="true" stored="true" />
+   <field name="mention_count_twitter" type="tlong" indexed="true" stored="true" />
+   <field name="mention_count_pinterest" type="tlong" indexed="true" stored="true" />
+   <field name="mention_count_facebook" type="tlong" indexed="true" stored="true" />
+   <field name="trended" type="boolean" indexed="true" stored="true" />
+   <field name="saves_count" type="tlong" indexed="true" stored="true" />
+   <field name="likes_count" type="tlong" indexed="true" stored="true" />
+   <field name="faves_count" type="tlong" indexed="true" stored="true" />
+   <field name="image_key" type="string" indexed="false" stored="true" />
+   <field name="text" type="text_en_splitting" indexed="true" stored="false" multiValued="true" termVectors="true" />
 
    <!-- Uncommenting the following will create a "timestamp" field using
         a default value of "NOW" to indicate when each document was indexed.
@@ -212,7 +204,7 @@
         or to add multiple fields to the same field for easier/faster searching.  -->
 
    <copyField source="name" dest="text"/>
-   <copyField source="brand" dest="text"/>
+   <copyField source="brand_uid" dest="text"/>
    <copyField source="description" dest="text"/>
 	
    <!-- Above, multiple source fields are copied to the [text] field. 
@@ -650,9 +642,7 @@
                              ratesFileLocation: URL or path to rates JSON file (default latest.json on the web)
                              refreshInterval: Number of minutes between each rates fetch (default: 1440, min: 60)
    -->
-   <!--
     <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />
-   -->
              
 
 

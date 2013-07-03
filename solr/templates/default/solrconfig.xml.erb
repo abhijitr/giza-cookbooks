@@ -80,6 +80,9 @@
   <lib dir="../../../dist/" regex="apache-solr-velocity-\d.*\.jar" />
   <lib dir="../../../contrib/velocity/lib" regex=".*\.jar" />
 
+  <lib dir="../../../dist/" regex="solr-dataimporthandler-\d.*\.jar" />
+  <lib dir="../../../contrib/dataimporthandler/lib" regex=".*\.jar" />
+
   <!-- If a 'dir' option (with or without a regex) is used and nothing
        is found that matches, it will be ignored
     -->
@@ -1465,6 +1468,12 @@
     <arr name="last-components">
       <str>elevator</str>
     </arr>
+  </requestHandler>
+
+  <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+    <lst name="defaults">
+      <str name="config">data-import-config.xml</str>
+    </lst>
   </requestHandler>
 
   <!-- Highlighting Component

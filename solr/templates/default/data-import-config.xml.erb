@@ -1,0 +1,21 @@
+<dataConfig>
+  <dataSource driver="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/gelato"
+              user=""
+              password=""/>
+  <script><![CDATA[
+    function ExtractJson(row) {
+      var json = row.get('mention_stats');
+      var obj = eval("(" + json + ")");
+      for (var prop in obj) {
+        row.put(prop, obj[prop]);
+      }
+      row.remove('mention_stats');
+      return row; 
+    }
+  ]]></script>
+  <document>
+    <entity name="product" transformer="script:ExtractJson" query="SELECT id,url,name,description,brand_uid,category_uid,subcategory_uid,store_domain,price,quantity,mention_stats,faves_count,image_keys[1] AS image_key FROM products">
+    </entity>
+  </document>
+</dataConfig>
