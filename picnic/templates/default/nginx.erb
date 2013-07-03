@@ -22,16 +22,6 @@ server {
     }
   }
 
-  location / {
-    proxy_pass http://127.0.0.1:8000/;
-    include /etc/nginx/proxy_params;
-  }
-
-  location /proxy/ {
-    proxy_pass http://127.0.0.1:8000;
-    limit_req zone=proxy burst=100;
-  }
-
   # Block all svn access
   if ($request_uri ~* ^.*\.svn.*$) {
      return 404;
