@@ -38,7 +38,9 @@ node[:deploy].each do |application, deploy|
     group deploy[:group] 
     owner deploy[:user] 
     action :create
-    requirements_file "#{deploy[:deploy_to]}/current/#{deploy[:requirements_path]}"
+    packages(
+      "thumbor" => "3.12.0"
+    )
   end
 
   # update thumbor config
@@ -55,6 +57,7 @@ node[:deploy].each do |application, deploy|
     action [:enable, :restart]
     command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/python #{deploy[:deploy_to]}/shared/#{application}-env/bin/thumbor --port=900%(process_num)s --conf=./thumbor.conf"
     numprocs 4
+    process_name "%(process_num)s"
     environment supervisor_env 
     stopsignal "TERM"
     directory "#{deploy[:deploy_to]}/current"
