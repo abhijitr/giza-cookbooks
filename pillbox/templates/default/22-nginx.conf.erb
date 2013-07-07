@@ -1,0 +1,7 @@
+:syslogtag, contains, "nginx-access" @@<%= @deploy[:splunk_url] %>
+
+# We don't want nginx-access going to /var/log/syslog, so end the rule here 
+& ~
+
+:syslogtag, contains, "nginx-error" @@<%= @deploy[:splunk_url] %>
+& ~
