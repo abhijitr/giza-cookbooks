@@ -31,11 +31,17 @@ remote_file "#{Chef::Config[:file_cache_path]}/distribute_setup.py" do
   not_if { ::File.exists?("#{pip_bindir}/pip") }
 end
 
+# HACK: As of 7/5/13 supervisor fails to install unless I add the 
+# seemingly pointless and redundant calls to 'pip install distribute' below. 
+# Something about distribute and setuptools clobbering each other. May be 
+# related to https://github.com/pypa/pip/issues/986
 bash "install-pip" do
   cwd Chef::Config[:file_cache_path]
   code <<-EOF
   #{python_bindir}/python distribute_setup.py
   #{pip_bindir}/easy_install pip
+  #{pip_bindir}/pip install --upgrade distribute
+  #{pip_bindir}/pip install distribute
   EOF
   not_if { ::File.exists?("#{pip_bindir}/pip") }
 end
