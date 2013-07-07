@@ -34,8 +34,3 @@ cookbook_file "/etc/logrotate.d/nginx" do
   source "logrotate_nginx"
   action :create
 end
-
-cookbook_file "/etc/logrotate.d/thumbor" do
-  source "logrotate_thumbor"
-  action :create
-end
