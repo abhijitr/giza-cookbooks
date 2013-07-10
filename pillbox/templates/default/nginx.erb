@@ -24,9 +24,12 @@ server {
     # rewrite rule for legacy image keys 
     rewrite /dimg/(.*)/(AMI[0-9A-Za-z_\-]*)$ /unsafe/$1/<%= @application[:legacy_image_store] %>/dimg/$2  break;
     rewrite /dimg/(AMI[0-9A-Za-z_\-]*)$ /unsafe/<%= @application[:legacy_image_store] %>/dimg/$1  break;
+    # rewrite rule for new style keys from s3 (scrapy-generated)
+    rewrite /dimg/(.*)/(full/[0-9A-Za-z]*\.(jpg|png|gif)) /unsafe/$1/<%= @application[:image_store] %>/$2  break;
+    rewrite /dimg/(full/[0-9A-Za-z]*\.(jpg|png|gif)) /unsafe/<%= @application[:image_store] %>/$1  break;    
     # rewrite rule for new style keys from s3
-    rewrite /dimg/(.*)/([0-9A-Za-z]*\.(jpg|png)) /unsafe/$1/<%= @application[:image_store] %>/$2  break;
-    rewrite /dimg/([0-9A-Za-z]*\.(jpg|png)) /unsafe/<%= @application[:image_store] %>/$1  break;
+    rewrite /dimg/(.*)/([0-9A-Za-z]*\.(jpg|png|gif)) /unsafe/$1/<%= @application[:image_store] %>/$2  break;
+    rewrite /dimg/([0-9A-Za-z]*\.(jpg|png|gif)) /unsafe/<%= @application[:image_store] %>/$1  break;
 
     proxy_pass http://thumbor;
   }
