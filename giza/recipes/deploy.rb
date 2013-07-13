@@ -53,6 +53,7 @@ node[:deploy].each do |application, deploy|
     command "#{deploy[:deploy_to]}/current/giza/deploy/start_worker.sh"
     environment supervisor_env 
     stopsignal "TERM"
+    stopasgroup true
     directory "#{deploy[:deploy_to]}/current"
     autostart false
     user deploy[:user] 
@@ -64,6 +65,7 @@ node[:deploy].each do |application, deploy|
     command "#{deploy[:deploy_to]}/current/giza/deploy/start_scheduler.sh"
     environment supervisor_env 
     stopsignal "TERM"
+    stopasgroup true
     directory "#{deploy[:deploy_to]}/current"
     autostart false
     user deploy[:user] 
@@ -75,6 +77,7 @@ node[:deploy].each do |application, deploy|
     command "uwsgi --lazy --ini-paste #{deploy[:deploy_to]}/current/#{deploy[:uwsgi_ini_path]} -s /tmp/uwsgi-#{application}.sock -H #{deploy[:deploy_to]}/shared/#{application}-env"
     environment supervisor_env
     stopsignal "INT"
+    stopasgroup true
     directory "#{deploy[:deploy_to]}/current"
     autostart false
     user deploy[:user] 
