@@ -17,7 +17,15 @@ server {
     uwsgi_pass unix:///tmp/uwsgi-<%= @application_name %>.sock;
     include uwsgi_params;
   }
-  
+
+  location /api {
+    uwsgi_pass unix:///tmp/uwsgi-<%= @application_name %>.sock;
+    include uwsgi_params;
+
+    gzip on;
+    gzip_types application/json;
+  }
+
   # Block all svn access
   if ($request_uri ~* ^.*\.svn.*$) {
      return 404;
