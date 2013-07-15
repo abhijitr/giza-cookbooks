@@ -26,6 +26,27 @@ server {
     gzip_types application/json;
   }
 
+  location ~* ^/static/(.*\.(js|css))$ {
+    root <%= deploy[:deploy_to] %>/current/<%= deploy[:static_path] %>;
+    try_files /$1 /$1/ =404;
+    
+    expires max;
+    access_log off;
+
+    gzip on;
+    gzip_types text/css application/javascript application/x-javascript text/plain;
+  }
+
+  location ~* ^/static/(.*)$ {
+    root <%= deploy[:deploy_to] %>/current/<%= deploy[:static_path] %>;
+    try_files /$1 /$1/ =404;
+    
+    access_log off;
+
+    gzip on;
+    gzip_types text/css application/javascript application/x-javascript text/plain;
+  }
+
   # Block all svn access
   if ($request_uri ~* ^.*\.svn.*$) {
      return 404;
