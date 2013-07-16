@@ -20,6 +20,8 @@
             query="SELECT
                      image_keys[1] AS image_key,
                      COALESCE(shopmode_eligible, false) AS shopmode_eligible,
+                     COALESCE(price, -1) AS price,
+                     COALESCE(sale_price, -1) AS sale_price,
                      *
                    FROM products">
     </entity>
