@@ -25,6 +25,14 @@ server {
   ssl_client_certificate /etc/nginx/ssl/<%= @application[:domains].first %>.ca;
   <% end -%>
 
+  location @uwsgi {
+    uwsgi_pass unix:///tmp/uwsgi-<%= @application_name %>.sock;
+    include uwsgi_params;
+
+    gzip on;
+    gzip_types text/css application/javascript application/x-javascript text/plain;
+  }
+
   location / {
     uwsgi_pass unix:///tmp/uwsgi-<%= @application_name %>.sock;
     include uwsgi_params;
@@ -40,10 +48,9 @@ server {
 
   location ~* ^/static/(.*\.(js|css))$ {
     root <%= @application[:deploy_to] %>/current/<%= @application[:static_path] %>;
-    try_files /$1 /$1/ =404;
+    try_files /$1 /$1/ @uwsgi;
     
     expires max;
-    access_log off;
 
     gzip on;
     gzip_types text/css application/javascript application/x-javascript text/plain;
@@ -51,10 +58,8 @@ server {
 
   location ~* ^/static/(.*)$ {
     root <%= @application[:deploy_to] %>/current/<%= @application[:static_path] %>;
-    try_files /$1 /$1/ =404;
+    try_files /$1 /$1/ @uwsgi;
     
-    access_log off;
-
     gzip on;
     gzip_types text/css application/javascript application/x-javascript text/plain;
   }
