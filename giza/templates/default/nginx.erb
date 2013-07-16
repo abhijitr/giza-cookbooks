@@ -37,7 +37,7 @@ server {
   }
 
   location ~* ^/static/(.*\.(js|css))$ {
-    root <%= deploy[:deploy_to] %>/current/<%= deploy[:static_path] %>;
+    root <%= @application[:deploy_to] %>/current/<%= @application[:static_path] %>;
     try_files /$1 /$1/ =404;
     
     expires max;
@@ -48,7 +48,7 @@ server {
   }
 
   location ~* ^/static/(.*)$ {
-    root <%= deploy[:deploy_to] %>/current/<%= deploy[:static_path] %>;
+    root <%= @application[:deploy_to] %>/current/<%= @application[:static_path] %>;
     try_files /$1 /$1/ =404;
     
     access_log off;
