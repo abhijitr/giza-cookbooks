@@ -14,7 +14,11 @@ kern.*				-/var/log/kern.log
 mail.*				-/var/log/mail.log
 #user.*				-/var/log/user.log
 
-# Everything that goes to /var/log/syslog should also go to splunk
+# Send contents of /var/log/syslog to splunk via a queue
+$ActionQueueType LinkedList   # use asynchronous processing
+$ActionQueueFileName varsyslogfwd # set file name, also enables disk mode
+$ActionResumeRetryCount -1    # infinite retries on insert failure
+$ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
 *.*;auth,authpriv.none	 @@<%= @deploy[:splunk_url] %>
 
 #

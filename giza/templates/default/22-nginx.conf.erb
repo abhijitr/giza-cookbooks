@@ -1,7 +1,19 @@
+# Send nginx-access lines to splunk via a queue
+$ActionQueueType LinkedList   # use asynchronous processing
+$ActionQueueFileName nginxaccessfwd # set file name, also enables disk mode
+$ActionResumeRetryCount -1    # infinite retries on insert failure
+$ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
 :syslogtag, contains, "nginx-access" @@<%= @deploy[:splunk_url] %>
 
 # We don't want nginx-access going to /var/log/syslog, so end the rule here 
 & ~
 
+# Send nginx-error lines to splunk via a queue
+$ActionQueueType LinkedList   # use asynchronous processing
+$ActionQueueFileName nginxerrorfwd # set file name, also enables disk mode
+$ActionResumeRetryCount -1    # infinite retries on insert failure
+$ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
 :syslogtag, contains, "nginx-error" @@<%= @deploy[:splunk_url] %>
+
+# We don't want nginx-error going to /var/log/syslog, so end the rule here 
 & ~
