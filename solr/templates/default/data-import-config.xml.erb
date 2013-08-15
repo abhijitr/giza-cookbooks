@@ -23,7 +23,10 @@
                      COALESCE(price, -1) AS price,
                      COALESCE(sale_price, -1) AS sale_price,
                      *
-                   FROM products">
+                   FROM products
+                   WHERE '${dataimporter.request.clean}' != 'false' OR
+                         updated_date > '${dataimporter.last_index_time}'
+                   ">
     </entity>
   </document>
 </dataConfig>
