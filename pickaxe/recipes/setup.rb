@@ -1,6 +1,6 @@
 include_recipe "python"
 include_recipe "supervisor"
 
-package "redis-server" do
+package "libpq-dev" do
   action :install
 end
