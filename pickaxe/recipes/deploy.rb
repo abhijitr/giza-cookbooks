@@ -53,7 +53,7 @@ node[:deploy].each do |application, deploy|
     environment supervisor_env
     stopsignal "TERM"
     stopasgroup true
-    directory "#{deploy[:deploy_to]}/current"
+    directory "#{deploy[:deploy_to]}/current/scrapy"
     autostart false
     user deploy[:user]
   end 
