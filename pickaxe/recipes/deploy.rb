@@ -50,7 +50,7 @@ node[:deploy].each do |application, deploy|
   # Start worker process under supervisor.
   supervisor_service "worker-#{application}" do
     action [:enable, :restart]
-    command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/python -m pickaxe.minion.run"
+    command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/python #{deploy[:deploy_to]}/current/pickaxe/minion/run.py"
     environment supervisor_env
     stopsignal "TERM"
     stopasgroup true
