@@ -43,7 +43,8 @@ node[:deploy].each do |application, deploy|
     "HOME" => "/home/#{deploy[:user]}",
     "USER" => deploy[:user],
     "USERNAME" => deploy[:user],
-    "LOGNAME" => deploy[:user]
+    "LOGNAME" => deploy[:user],
+    "PYTHONPATH" => "#{deploy[:deploy_to]}/current" 
   })
 
   # Start worker process under supervisor.
@@ -53,7 +54,7 @@ node[:deploy].each do |application, deploy|
     environment supervisor_env
     stopsignal "TERM"
     stopasgroup true
-    directory "#{deploy[:deploy_to]}/current"
+    directory "#{deploy[:deploy_to]}/current/pickaxe"
     autostart false
     user deploy[:user]
   end 
