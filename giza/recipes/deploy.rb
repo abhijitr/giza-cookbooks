@@ -26,7 +26,7 @@ node[:deploy].each do |application, deploy|
     deploy_data deploy
   end
 
-  directory "/var/lib/#{application}" do
+  directory "/var/lib/#{application}/data" do
     group deploy[:group]
     owner deploy[:user]
     mode 0770
