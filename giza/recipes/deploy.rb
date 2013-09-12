@@ -26,6 +26,14 @@ node[:deploy].each do |application, deploy|
     deploy_data deploy
   end
 
+  directory "/var/lib/#{application}" do
+    group deploy[:group]
+    owner deploy[:user]
+    mode 0770
+    action :create
+    recursive true
+  end
+
   directory "#{deploy[:deploy_to]}/shared/#{application}-env" do
     group deploy[:group]
     owner deploy[:user]
