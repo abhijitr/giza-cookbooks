@@ -92,6 +92,25 @@ node[:deploy].each do |application, deploy|
   end 
 
   # configure nginx 
+  directory "/etc/nginx/include.d" do
+    owner "root"
+    group "root"
+    mode 0755
+    action :create
+    recursive true
+  end
+
+  template "/etc/nginx/include.d/giza-common" do
+    source "giza-common.erb" 
+    owner "root" 
+    group "root" 
+    mode 0644
+    variables(
+      :application => deploy,
+      :application_name => application
+    )
+  end
+
   nginx_web_app application do
     application deploy
     template "nginx.erb"
