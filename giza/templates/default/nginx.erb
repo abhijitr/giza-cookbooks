@@ -29,3 +29,18 @@ server {
 
   include /etc/nginx/include.d/giza-common;
 }
+
+server {
+  listen 80;
+  server_name look.pickie.com looks.pickie.com; 
+
+  location / {
+    rewrite /$ /s break;
+    rewrite /(.*)$ /s/$1  break;
+
+    uwsgi_pass unix:///tmp/uwsgi-<%= @application_name %>.sock;
+    include uwsgi_params;
+  }
+
+  include /etc/nginx/include.d/giza-common;
+}
