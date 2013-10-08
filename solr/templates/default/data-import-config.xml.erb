@@ -21,7 +21,7 @@
                      image_keys[1] AS image_key,
                      COALESCE(shopmode_eligible, false) AS shopmode_eligible,
                      COALESCE(price, -1) AS price,
-                     COALESCE(sale_price, -1) AS sale_price,
+                     COALESCE(original_price, -1) AS original_price,
                      *
                    FROM products
                    WHERE '${dataimporter.request.clean}' != 'false' OR
