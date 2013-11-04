@@ -1,61 +1,61 @@
 include_recipe "virtualenv"
 
-node[:deploy].each do |application, deploy|
-  if deploy[:application_type] != 'pickaxe'
-    Chef::Log.debug("Skipping deploy::web application #{application} as it is not a pickaxe app")
+node[:deploy].each do |app_name, app|
+  if app[:application_type] != 'pickaxe'
+    Chef::Log.debug("Skipping pickaxe::deploy application #{app_name} as it is not a pickaxe app")
     next
   end
 
   opsworks_deploy_dir do
-    user deploy[:user]
-    group deploy[:group]
-    path deploy[:deploy_to]
+    user app[:user]
+    group app[:group]
+    path app[:deploy_to]
   end
 
   opsworks_deploy do
-    app application
-    deploy_data deploy
+    app app_name
+    deploy_data app
   end
 
-  directory "#{deploy[:deploy_to]}/shared/#{application}-env" do
-    group deploy[:group]
-    owner deploy[:user]
+  directory "#{app[:deploy_to]}/shared/#{app_name}-env" do
+    group app[:group]
+    owner app[:user]
     mode 0770
     action :create
     recursive true
   end
 
-  virtualenv "#{deploy[:deploy_to]}/shared/#{application}-env" do
-    group deploy[:group]
-    owner deploy[:user]
+  virtualenv "#{app[:deploy_to]}/shared/#{app_name}-env" do
+    group app[:group]
+    owner app[:user]
     action :create
-    requirements_file "#{deploy[:deploy_to]}/current/#{deploy[:requirements_path]}"
+    requirements_file "#{app[:deploy_to]}/current/#{app[:requirements_path]}"
   end
 
   # Install all the modules in npm_requirements.txt.
-  execute "npm-dependencies-#{application}" do
-    command "cat #{deploy[:deploy_to]}/current/#{deploy[:npm_requirements_path]} | xargs npm install -g"
-    only_if "test -f #{deploy[:deploy_to]}/current/#{deploy[:npm_requirements_path]}"
+  execute "npm-dependencies-#{app_name}" do
+    command "cat #{app[:deploy_to]}/current/#{app[:npm_requirements_path]} | xargs npm install -g"
+    only_if "test -f #{app[:deploy_to]}/current/#{app[:npm_requirements_path]}"
   end
 
-  supervisor_env = deploy[:environment].merge({
-    "virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env",
-    "HOME" => "/home/#{deploy[:user]}",
-    "USER" => deploy[:user],
-    "USERNAME" => deploy[:user],
-    "LOGNAME" => deploy[:user],
-    "PYTHONPATH" => "#{deploy[:deploy_to]}/current" 
+  supervisor_env = app[:environment].merge({
+    "virtualenv_root" => "#{app[:deploy_to]}/shared/#{app_name}-env",
+    "HOME" => "/home/#{app[:user]}",
+    "USER" => app[:user],
+    "USERNAME" => app[:user],
+    "LOGNAME" => app[:user],
+    "PYTHONPATH" => "#{app[:deploy_to]}/current" 
   })
 
   # Start worker process under supervisor.
-  supervisor_service "worker-#{application}" do
+  supervisor_service "worker-#{app_name}" do
     action [:enable, :restart]
-    command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/python #{deploy[:deploy_to]}/current/pickaxe/minion/run.py"
+    command "#{app[:deploy_to]}/shared/#{app_name}-env/bin/python #{app[:deploy_to]}/current/pickaxe/minion/run.py"
     environment supervisor_env
     stopsignal "TERM"
     stopasgroup true
-    directory "#{deploy[:deploy_to]}/current/pickaxe"
+    directory "#{app[:deploy_to]}/current/pickaxe"
     autostart false
-    user deploy[:user]
+    user app[:user]
   end 
 end

@@ -15,7 +15,7 @@ mail.*				-/var/log/mail.log
 #user.*				-/var/log/user.log
 
 # Everything that goes to /var/log/syslog should also go to splunk
-*.*;auth,authpriv.none	 @@<%= @deploy[:splunk_url] %>
+*.*;auth,authpriv.none	 @@<%= @application[:splunk_url] %>
 
 #
 # Logging for the mail system.  Split it up so that

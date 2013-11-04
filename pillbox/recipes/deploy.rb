@@ -1,42 +1,42 @@
 include_recipe "nginx::service"
 include_recipe "virtualenv"
 
-node[:deploy].each do |application, deploy|
-  if deploy[:application_type] != 'giza'
-    Chef::Log.debug("Skipping deploy::web application #{application} as it is not a giza app")
+node[:deploy].each do |app_name, app|
+  if app[:application_type] != 'giza'
+    Chef::Log.debug("Skipping pillbox::deploy application #{app_name} as it is not a giza app")
     next
   end
 
-  supervisor_env = deploy[:environment].merge({
-    "virtualenv_root" => "#{deploy[:deploy_to]}/shared/#{application}-env",
-    "HOME" => "/home/#{deploy[:user]}",
-    "USER" => deploy[:user],
-    "USERNAME" => deploy[:user],
-    "LOGNAME" => deploy[:user]
+  supervisor_env = app[:environment].merge({
+    "virtualenv_root" => "#{app[:deploy_to]}/shared/#{app_name}-env",
+    "HOME" => "/home/#{app[:user]}",
+    "USER" => app[:user],
+    "USERNAME" => app[:user],
+    "LOGNAME" => app[:user]
   })
 
   opsworks_deploy_dir do
-    user deploy[:user]
-    group deploy[:group]
-    path deploy[:deploy_to]
+    user app[:user]
+    group app[:group]
+    path app[:deploy_to]
   end
 
   opsworks_deploy do
-    app application
-    deploy_data deploy
+    app app_name 
+    deploy_data app
   end
 
-  directory "#{deploy[:deploy_to]}/shared/#{application}-env" do
-    group deploy[:group]
-    owner deploy[:user]
+  directory "#{app[:deploy_to]}/shared/#{app_name}-env" do
+    group app[:group]
+    owner app[:user]
     mode 0770
     action :create
     recursive true
   end
 
-  virtualenv "#{deploy[:deploy_to]}/shared/#{application}-env" do
-    group deploy[:group] 
-    owner deploy[:user] 
+  virtualenv "#{app[:deploy_to]}/shared/#{app_name}-env" do
+    group app[:group] 
+    owner app[:user] 
     action :create
     packages(
       "thumbor" => "3.12.0"
@@ -44,30 +44,30 @@ node[:deploy].each do |application, deploy|
   end
 
   # update thumbor config
-  template "#{deploy[:deploy_to]}/current/thumbor.conf" do
+  template "#{app[:deploy_to]}/current/thumbor.conf" do
     source "thumbor.conf.erb" 
     mode 0644
     variables(
-      :deploy => deploy
+      :application => app
     )
   end
 
   # start thumbor process under supervisor
-  supervisor_service "thumbor-#{application}" do
+  supervisor_service "thumbor-#{app_name}" do
     action [:enable, :restart]
-    command "#{deploy[:deploy_to]}/shared/#{application}-env/bin/python #{deploy[:deploy_to]}/shared/#{application}-env/bin/thumbor --port=900%(process_num)s --conf=./thumbor.conf"
+    command "#{app[:deploy_to]}/shared/#{app_name}-env/bin/python #{app[:deploy_to]}/shared/#{app_name}-env/bin/thumbor --port=900%(process_num)s --conf=./thumbor.conf"
     numprocs 4
     process_name "%(process_num)s"
     environment supervisor_env 
     stopsignal "TERM"
-    directory "#{deploy[:deploy_to]}/current"
+    directory "#{app[:deploy_to]}/current"
     autostart false
-    user deploy[:user] 
+    user app[:user] 
   end 
 
   # configure nginx 
-  nginx_web_app application do
-    application deploy
+  nginx_web_app app_name do
+    application app
     template "nginx.erb"
     cookbook "pillbox"
   end 
@@ -83,7 +83,7 @@ node[:deploy].each do |application, deploy|
     source "rsyslog.conf.erb" 
     mode 0644
     variables(
-      :deploy => deploy
+      :application => app
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
@@ -93,7 +93,7 @@ node[:deploy].each do |application, deploy|
     source "50-default.conf.erb"
     mode 0644
     variables(
-      :deploy => deploy
+      :application => app 
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
