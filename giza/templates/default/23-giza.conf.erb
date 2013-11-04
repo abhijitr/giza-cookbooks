@@ -3,7 +3,7 @@ $ActionQueueType LinkedList   # use asynchronous processing
 $ActionQueueFileName analfwd # set file name, also enables disk mode
 $ActionResumeRetryCount -1    # infinite retries on insert failure
 $ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
-:msg, contains, "mod=giza.logic.anal" @@<%= @deploy[:splunk_url] %>
+:msg, contains, "mod=giza.logic.anal" @@<%= @application[:splunk_url] %>
 
 # Send to disk
 :msg, contains, "mod=giza.logic.anal" /var/log/giza/anal.log

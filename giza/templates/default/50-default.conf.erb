@@ -19,7 +19,7 @@ $ActionQueueType LinkedList   # use asynchronous processing
 $ActionQueueFileName varsyslogfwd # set file name, also enables disk mode
 $ActionResumeRetryCount -1    # infinite retries on insert failure
 $ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
-*.*;auth,authpriv.none	 @@<%= @deploy[:splunk_url] %>
+*.*;auth,authpriv.none	 @@<%= @application[:splunk_url] %>
 
 #
 # Logging for the mail system.  Split it up so that
