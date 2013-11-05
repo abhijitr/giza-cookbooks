@@ -2,10 +2,12 @@ include_recipe "nginx::service"
 include_recipe "virtualenv"
 
 node[:deploy].each do |app_name, app|
-  if app[:application_type] != 'giza'
-    Chef::Log.debug("Skipping picnic::deploy application #{app_name} as it is not a giza app")
+  unless app[:layers].key?(:picnic)
+    Chef::Log.debug("Skipping picnic::deploy application #{app_name} as it does not require picnic")
     next
   end
+
+  layer = app[:layers][:picnic]
 
   opsworks_deploy_dir do
     user app[:user]

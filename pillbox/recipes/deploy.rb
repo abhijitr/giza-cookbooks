@@ -2,10 +2,12 @@ include_recipe "nginx::service"
 include_recipe "virtualenv"
 
 node[:deploy].each do |app_name, app|
-  if app[:application_type] != 'giza'
-    Chef::Log.debug("Skipping pillbox::deploy application #{app_name} as it is not a giza app")
+  unless app[:layers].key?(:pillbox)
+    Chef::Log.debug("Skipping pillbox::deploy application #{app_name} as it does not require pillbox")
     next
   end
+
+  layer = app[:layers][:pillbox]
 
   supervisor_env = app[:environment].merge({
     "virtualenv_root" => "#{app[:deploy_to]}/shared/#{app_name}-env",

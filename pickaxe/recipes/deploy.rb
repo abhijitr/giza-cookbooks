@@ -1,10 +1,12 @@
 include_recipe "virtualenv"
 
 node[:deploy].each do |app_name, app|
-  if app[:application_type] != 'pickaxe'
-    Chef::Log.debug("Skipping pickaxe::deploy application #{app_name} as it is not a pickaxe app")
+  unless app[:layers].key?(:pickaxe)
+    Chef::Log.debug("Skipping pickaxe::deploy application #{app_name} as it does not require pickaxe")
     next
   end
+
+  layer = app[:layers][:pickaxe]
 
   opsworks_deploy_dir do
     user app[:user]
@@ -29,13 +31,13 @@ node[:deploy].each do |app_name, app|
     group app[:group]
     owner app[:user]
     action :create
-    requirements_file "#{app[:deploy_to]}/current/#{app[:requirements_path]}"
+    requirements_file "#{app[:deploy_to]}/current/#{layer[:requirements_path]}"
   end
 
   # Install all the modules in npm_requirements.txt.
   execute "npm-dependencies-#{app_name}" do
-    command "cat #{app[:deploy_to]}/current/#{app[:npm_requirements_path]} | xargs npm install -g"
-    only_if "test -f #{app[:deploy_to]}/current/#{app[:npm_requirements_path]}"
+    command "cat #{app[:deploy_to]}/current/#{layer[:npm_requirements_path]} | xargs npm install -g"
+    only_if "test -f #{app[:deploy_to]}/current/#{layer[:npm_requirements_path]}"
   end
 
   supervisor_env = app[:environment].merge({
@@ -50,7 +52,7 @@ node[:deploy].each do |app_name, app|
   # Start worker process under supervisor.
   supervisor_service "worker-#{app_name}" do
     action [:enable, :restart]
-    command "#{app[:deploy_to]}/shared/#{app_name}-env/bin/python #{app[:deploy_to]}/current/pickaxe/minion/run.py"
+    command "#{app[:deploy_to]}/shared/#{app_name}-env/bin/python #{app[:deploy_to]}/current/#{layer[:minion_path]}"
     environment supervisor_env
     stopsignal "TERM"
     stopasgroup true

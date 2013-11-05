@@ -2,10 +2,12 @@ include_recipe "nginx::service"
 include_recipe "virtualenv"
 
 node[:deploy].each do |app_name, app|
-  if app[:application_type] != 'giza'
-    Chef::Log.debug("Skipping giza::deploy application #{app_name} as it is not a giza app")
+  unless app[:layers].key?(:giza)
+    Chef::Log.debug("Skipping giza::deploy application #{app_name} as it does not require giza")
     next
   end
+
+  layer = app[:layers][:giza]
 
   supervisor_env = app[:environment].merge({
     "virtualenv_root" => "#{app[:deploy_to]}/shared/#{app_name}-env",
@@ -46,19 +48,19 @@ node[:deploy].each do |app_name, app|
     group app[:group] 
     owner app[:user] 
     action :create
-    requirements_file "#{app[:deploy_to]}/current/#{app[:requirements_path]}"
+    requirements_file "#{app[:deploy_to]}/current/#{layer[:requirements_path]}"
   end
 
   # install all the modules in npm_requirements.txt
   execute "npm-dependencies-#{app_name}" do
-    command "cat #{app[:deploy_to]}/current/#{app[:npm_requirements_path]} | xargs npm install -g"
-    only_if "test -f #{app[:deploy_to]}/current/#{app[:npm_requirements_path]}"
+    command "cat #{app[:deploy_to]}/current/#{layer[:npm_requirements_path]} | xargs npm install -g"
+    only_if "test -f #{app[:deploy_to]}/current/#{layer[:npm_requirements_path]}"
   end
 
   # start worker process under supervisor
   supervisor_service "worker-#{app_name}" do
     action [:enable, :restart]
-    command "#{app[:deploy_to]}/current/giza/deploy/start_worker.sh"
+    command "#{app[:deploy_to]}/current/#{layer[:worker_path]}"
     environment supervisor_env 
     stopsignal "TERM"
     stopasgroup true
@@ -70,7 +72,7 @@ node[:deploy].each do |app_name, app|
   # start celerybeat under supervisor
   supervisor_service "scheduler-#{app_name}" do
     action [:enable, :restart]
-    command "#{app[:deploy_to]}/current/giza/deploy/start_scheduler.sh"
+    command "#{app[:deploy_to]}/current/#{layer[:scheduler_path]}"
     environment supervisor_env 
     stopsignal "TERM"
     stopasgroup true
@@ -82,7 +84,7 @@ node[:deploy].each do |app_name, app|
   # start uwsgi under supervisor
   supervisor_service "uwsgi-#{app_name}" do
     action [:enable, :restart]
-    command "uwsgi --lazy --ini-paste #{app[:deploy_to]}/current/#{app[:uwsgi_ini_path]} -s /tmp/uwsgi-#{app_name}.sock -H #{app[:deploy_to]}/shared/#{app_name}-env"
+    command "uwsgi --lazy --ini-paste #{app[:deploy_to]}/current/#{layer[:uwsgi_ini_path]} -s /tmp/uwsgi-#{app_name}.sock -H #{app[:deploy_to]}/shared/#{app_name}-env"
     environment supervisor_env
     stopsignal "INT"
     stopasgroup true
