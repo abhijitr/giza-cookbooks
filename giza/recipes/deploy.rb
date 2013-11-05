@@ -122,8 +122,8 @@ node[:deploy].each do |app_name, app|
   end 
 
   # configure nginx 
-  template "/etc/nginx/include.d/giza-common" do
-    source "giza-common.erb" 
+  template "/etc/nginx/include.d/#{app_name}-common" do
+    source "nginx_common.erb" 
     owner "root" 
     group "root" 
     mode 0644
