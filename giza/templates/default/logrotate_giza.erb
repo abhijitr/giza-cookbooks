@@ -1,4 +1,4 @@
-/var/log/giza/*.log {
+/var/log/<%= @application_name %>/*.log {
         daily
         missingok
         rotate 7 
@@ -9,11 +9,11 @@
         postrotate
                 reload rsyslog >/dev/null 2>&1 || true
 
-                for f in /var/log/giza/*.lzo
+                for f in /var/log/<%= @application_name %>/*.lzo
                 do
                     if [ -e $f ]
                     then
-                        /usr/local/bin/aws s3 put-object --bucket pickie-logs --key giza/$(basename $f) --body $f 
+                        /usr/local/bin/aws s3 put-object --bucket <%= @application_name %>-logs --key giza/$(basename $f) --body $f 
                     fi
                 done
         endscript

@@ -176,4 +176,14 @@ node[:deploy].each do |app_name, app|
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
+
+  # Configure logrotate
+  template '/etc/logrotate.d/{#app_name}' do
+    source 'logrotate_giza.erb'
+    mode   '0644'
+    variables(
+      :application => app,
+      :application_name => app_name
+    )
+  end
 end

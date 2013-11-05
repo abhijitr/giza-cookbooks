@@ -28,7 +28,3 @@ cookbook_file "/etc/logrotate.d/nginx" do
   action :create
 end
 
-cookbook_file "/etc/logrotate.d/giza" do
-  source "logrotate_giza"
-  action :create
-end
