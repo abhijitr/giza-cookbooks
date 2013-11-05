@@ -6,7 +6,7 @@ $ActionQueueSaveOnShutdown on # save in-memory data if rsyslog shuts down
 :msg, contains, "mod=giza.logic.anal" @@<%= @application[:splunk_url] %>
 
 # Send to disk
-:msg, contains, "mod=giza.logic.anal" /var/log/giza/anal.log
+:msg, contains, "mod=giza.logic.anal" /var/log/<%= @application_name %>/anal.log
 
 # We don't want giza.logic.anal going to /var/log/syslog, so end the rule here 
 & ~

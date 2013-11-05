@@ -50,7 +50,8 @@ node[:deploy].each do |app_name, app|
     source "thumbor.conf.erb" 
     mode 0644
     variables(
-      :application => app
+      :application => app,
+      :application_name => app_name
     )
   end
 
@@ -85,7 +86,8 @@ node[:deploy].each do |app_name, app|
     source "rsyslog.conf.erb" 
     mode 0644
     variables(
-      :application => app
+      :application => app,
+      :application_name => app_name
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
@@ -95,7 +97,8 @@ node[:deploy].each do |app_name, app|
     source "50-default.conf.erb"
     mode 0644
     variables(
-      :application => app 
+      :application => app,
+      :application_name => app_name
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end

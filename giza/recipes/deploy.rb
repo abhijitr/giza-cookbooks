@@ -125,7 +125,8 @@ node[:deploy].each do |app_name, app|
     group app[:group] 
     mode 0644
     variables(
-      :application => app 
+      :application => app,
+      :application_name => app_name
     )
   end
 
@@ -140,7 +141,8 @@ node[:deploy].each do |app_name, app|
     source "rsyslog.conf.erb" 
     mode 0644
     variables(
-      :application => app 
+      :application => app,
+      :application_name => app_name
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
@@ -149,16 +151,18 @@ node[:deploy].each do |app_name, app|
     source "22-nginx.conf.erb"
     mode 0644
     variables(
-      :application => app 
+      :application => app,
+      :application_name => app_name
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
   
-  template "/etc/rsyslog.d/23-giza.conf" do
+  template "/etc/rsyslog.d/23-{#app_name}.conf" do
     source "23-giza.conf.erb"
     mode 0644
     variables(
-      :application => app 
+      :application => app,
+      :application_name => app_name
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
@@ -167,7 +171,8 @@ node[:deploy].each do |app_name, app|
     source "50-default.conf.erb"
     mode 0644
     variables(
-      :application => app 
+      :application => app,
+      :application_name => app_name
     )
     notifies :reload, resources(:service => "rsyslog"), :delayed
   end
