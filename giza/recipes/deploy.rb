@@ -1,6 +1,34 @@
 include_recipe "nginx::service"
 include_recipe "virtualenv"
 
+##
+# Configuration shared by all apps
+##
+
+# Define me a rsyslog service so we can restart it
+service "rsyslog" do
+  supports :restart => true, :reload => true
+  action :nothing
+end
+
+# update rsyslog config
+template "/etc/rsyslog.conf" do
+  source "rsyslog.conf.erb" 
+  mode 0644
+  notifies :reload, resources(:service => "rsyslog"), :delayed
+end
+
+directory "/etc/nginx/include.d" do
+  owner "root"
+  group "root"
+  mode 0755
+  action :create
+  recursive true
+end
+
+##
+# Per-app configuration
+##
 node[:deploy].each do |app_name, app|
   unless app[:layers].key?(:giza)
     Chef::Log.debug("Skipping giza::deploy application #{app_name} as it does not require giza")
@@ -94,14 +122,6 @@ node[:deploy].each do |app_name, app|
   end 
 
   # configure nginx 
-  directory "/etc/nginx/include.d" do
-    owner "root"
-    group "root"
-    mode 0755
-    action :create
-    recursive true
-  end
-
   template "/etc/nginx/include.d/giza-common" do
     source "giza-common.erb" 
     owner "root" 
@@ -119,62 +139,38 @@ node[:deploy].each do |app_name, app|
     cookbook "giza"
   end 
 
-  template "/etc/boto.cfg" do
-    source "boto_config.erb" 
-    owner app[:user] 
-    group app[:group] 
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-  end
-
-  # Define me a rsyslog service so we can restart it
-  service "rsyslog" do
-    supports :restart => true, :reload => true
-    action :nothing
-  end
-
-  # update rsyslog config
-  template "/etc/rsyslog.conf" do
-    source "rsyslog.conf.erb" 
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-    notifies :reload, resources(:service => "rsyslog"), :delayed
-  end
-  
-  template "/etc/rsyslog.d/22-nginx.conf" do
-    source "22-nginx.conf.erb"
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-    notifies :reload, resources(:service => "rsyslog"), :delayed
-  end
-  
-  template "/etc/rsyslog.d/23-{#app_name}.conf" do
-    source "23-giza.conf.erb"
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-    notifies :reload, resources(:service => "rsyslog"), :delayed
-  end
-  
-  template "/etc/rsyslog.d/50-default.conf" do
-    source "50-default.conf.erb"
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-    notifies :reload, resources(:service => "rsyslog"), :delayed
+  # NOTE: If more than one app has a splunk_url defined, rsyslog settings
+  # will clobber each other!! Need to refactor this to make it work.
+  if app.key?("splunk_url")
+    template "/etc/rsyslog.d/22-nginx.conf" do
+      source "22-nginx.conf.erb"
+      mode 0644
+      variables(
+        :application => app,
+        :application_name => app_name
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
+    
+    template "/etc/rsyslog.d/23-{#app_name}.conf" do
+      source "23-giza.conf.erb"
+      mode 0644
+      variables(
+        :application => app,
+        :application_name => app_name
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
+    
+    template "/etc/rsyslog.d/50-default.conf" do
+      source "50-default.conf.erb"
+      mode 0644
+      variables(
+        :application => app,
+        :application_name => app_name
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
   end
 
   # Configure logrotate

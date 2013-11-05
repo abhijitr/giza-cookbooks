@@ -1,6 +1,12 @@
 include_recipe "nginx::service"
 include_recipe "virtualenv"
 
+# Define me a rsyslog service so we can restart it
+service "rsyslog" do
+  supports :restart => true, :reload => true
+  action :nothing
+end
+
 node[:deploy].each do |app_name, app|
   unless app[:layers].key?(:pillbox)
     Chef::Log.debug("Skipping pillbox::deploy application #{app_name} as it does not require pillbox")
@@ -75,31 +81,29 @@ node[:deploy].each do |app_name, app|
     cookbook "pillbox"
   end 
 
-  # Define me a rsyslog service so we can restart it
-  service "rsyslog" do
-    supports :restart => true, :reload => true
-    action :nothing
-  end
-
-  # update rsyslog config
-  template "/etc/rsyslog.conf" do
-    source "rsyslog.conf.erb" 
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-    notifies :reload, resources(:service => "rsyslog"), :delayed
-  end
-  
-  # TODO: rsyslog conf for thumbor 
-  template "/etc/rsyslog.d/50-default.conf" do
-    source "50-default.conf.erb"
-    mode 0644
-    variables(
-      :application => app,
-      :application_name => app_name
-    )
-    notifies :reload, resources(:service => "rsyslog"), :delayed
+  # NOTE: If more than one app has a splunk_url defined, rsyslog settings
+  # will clobber each other!! Need to refactor this to make it work.
+  if app.key?("splunk_url")
+    # update rsyslog config
+    template "/etc/rsyslog.conf" do
+      source "rsyslog.conf.erb" 
+      mode 0644
+      variables(
+        :application => app,
+        :application_name => app_name
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
+    
+    # TODO: rsyslog conf for thumbor 
+    template "/etc/rsyslog.d/50-default.conf" do
+      source "50-default.conf.erb"
+      mode 0644
+      variables(
+        :application => app,
+        :application_name => app_name
+      )
+      notifies :reload, resources(:service => "rsyslog"), :delayed
+    end
   end
 end
