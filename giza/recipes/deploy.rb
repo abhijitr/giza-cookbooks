@@ -135,7 +135,7 @@ node[:deploy].each do |app_name, app|
 
   nginx_web_app app_name do
     application app
-    template "nginx.erb"
+    template "nginx_#{app_name}.erb"
     cookbook "giza"
   end 
 

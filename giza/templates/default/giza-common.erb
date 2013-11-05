@@ -1,4 +1,4 @@
-  access_log  <%= node[:nginx][:log_dir] %>/<%= @application[:domains].first %>.access.log timed;
+  access_log  <%= node[:nginx][:log_dir] %>/<%= @application_name %>.access.log timed;
   underscores_in_headers on;
 
   client_max_body_size 20m;
