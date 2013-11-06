@@ -8,6 +8,11 @@ service "rsyslog" do
 end
 
 node[:deploy].each do |app_name, app|
+  unless app.key?[:application]
+    Chef::Log.debug("Skipping pillbox::deploy application #{app_name} as it isn't actually getting deployed")
+    next
+  end
+
   unless app[:layers].key?(:pillbox)
     Chef::Log.debug("Skipping pillbox::deploy application #{app_name} as it does not require pillbox")
     next

@@ -1,6 +1,11 @@
 include_recipe "virtualenv"
 
 node[:deploy].each do |app_name, app|
+  unless app.key?[:application]
+    Chef::Log.debug("Skipping pickaxe::deploy application #{app_name} as it isn't actually getting deployed")
+    next
+  end
+
   unless app[:layers].key?(:pickaxe)
     Chef::Log.debug("Skipping pickaxe::deploy application #{app_name} as it does not require pickaxe")
     next
