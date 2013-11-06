@@ -2,7 +2,7 @@ include_recipe "nginx::service"
 include_recipe "virtualenv"
 
 node[:deploy].each do |app_name, app|
-  unless app.key?[:application]
+  unless app.key?(:application)
     Chef::Log.debug("Skipping picnic::deploy application #{app_name} as it isn't actually getting deployed")
     next
   end

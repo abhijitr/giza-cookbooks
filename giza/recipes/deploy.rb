@@ -30,7 +30,7 @@ end
 # Per-app configuration
 ##
 node[:deploy].each do |app_name, app|
-  unless app.key?[:application]
+  unless app.key?(:application)
     Chef::Log.debug("Skipping giza::deploy application #{app_name} as it isn't actually getting deployed")
     next
   end
